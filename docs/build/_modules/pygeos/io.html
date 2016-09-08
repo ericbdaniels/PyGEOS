@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pygeos.io &mdash; PyGEOS 1.0 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="PyGEOS 1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../../index.html" class="fa fa-home"> PyGEOS</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">PyGEOS</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>pygeos.io</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <h1>Source code for pygeos.io</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">module for import/export functions</span>
+
+<span class="sd">NOTE: many functions require the Geosoft GX plug-in</span>
+<span class="sd">Currently commented out b/c I am no longer working with geosoft regularly.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;Eric Daniels&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="c">#import geosoft.gx as gx </span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">matplotlib.path</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="kn">as</span> <span class="nn">patches</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pygslib</span> <span class="kn">as</span> <span class="nn">gs</span> 
+
+
+
+<span class="c">#os.environ[&#39;GX_GEOSOFT_BIN_PATH&#39;] = &#39;C:\\Program Files (x86)\\Geosoft\\bin&#39;</span>
+<span class="c">#ctx = gx.GXContext.create(&#39;test&#39;,&#39;Geosoft Inc.&#39;)</span>
+
+<span class="c">#read grid from geosoft binary to pandas dataframe</span>
+<div class="viewcode-block" id="read_gxgrid"><a class="viewcode-back" href="../../index.html#pygeos.io.read_gxgrid">[docs]</a><span class="k">def</span> <span class="nf">read_gxgrid</span><span class="p">(</span><span class="n">GridPath</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read geosoft grid to pandas dataframe</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">        GridPath: Filepath of Geosoft grid</span>
+
+<span class="sd">        name: Name for column header in pandas dataframe</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Pandas DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">GridObj</span> <span class="o">=</span> <span class="n">gx</span><span class="o">.</span><span class="n">GXIMG</span><span class="o">.</span><span class="n">create_file</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">gx</span><span class="o">.</span><span class="n">GS_TYPE_DEFAULT</span><span class="p">,</span><span class="n">GridPath</span><span class="p">,</span> <span class="n">gx</span><span class="o">.</span><span class="n">IMG_FILE_READORWRITE</span><span class="p">)</span>
+    <span class="n">PgObj</span> <span class="o">=</span> <span class="n">GridObj</span><span class="o">.</span><span class="n">geth_pg</span><span class="p">()</span>
+    <span class="n">tempfile</span> <span class="o">=</span> <span class="n">name</span><span class="o">+</span><span class="s">&#39;.txt&#39;</span>
+    <span class="n">WaObj</span> <span class="o">=</span> <span class="n">gx</span><span class="o">.</span><span class="n">GXWA</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="n">tempfile</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">PgObj</span><span class="o">.</span><span class="n">write_wa</span><span class="p">(</span><span class="n">WaObj</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s">&#39;-1e21&#39;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">tempfile</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">r&quot;\s+&quot;</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">df</span> 
+
+</div>
+<div class="viewcode-block" id="to_gxgrid"><a class="viewcode-back" href="../../index.html#pygeos.io.to_gxgrid">[docs]</a><span class="k">def</span> <span class="nf">to_gxgrid</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">name</span><span class="p">,</span> <span class="n">griddef</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert Pandas DataFrame to Geosoft grid</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">        df: Pandas DataFrame to be Gridded</span>
+<span class="sd">        name: variable name</span>
+<span class="sd">        griddef: pygslib GridDef object to set grid definition</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (GXgrd): Geosoft grid (.grd)</span>
+
+<span class="sd">        Note: this function does not set the projection </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nrows</span><span class="o">=</span><span class="n">griddef</span><span class="o">.</span><span class="n">nx</span>
+    <span class="n">ncols</span><span class="o">=</span><span class="n">griddef</span><span class="o">.</span><span class="n">ny</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">RaObj</span> <span class="o">=</span> <span class="n">gx</span><span class="o">.</span><span class="n">GXRA</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="n">name</span><span class="p">)</span> <span class="c">#use os.remove after?</span>
+    <span class="n">PgObj</span> <span class="o">=</span> <span class="n">gx</span><span class="o">.</span><span class="n">GXPG</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="n">ncols</span><span class="p">,</span><span class="n">nrows</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">PgObj</span><span class="o">.</span><span class="n">read_ra</span><span class="p">(</span><span class="n">RaObj</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">name</span><span class="p">)</span> <span class="c">#throwing error</span>
+    <span class="n">GridObj</span> <span class="o">=</span> <span class="n">gx</span><span class="o">.</span><span class="n">GXIMG</span><span class="o">.</span><span class="n">create_new_file</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">nrows</span><span class="p">,</span><span class="n">ncols</span><span class="p">,</span><span class="n">name</span><span class="o">+</span><span class="s">&#39;.grd&#39;</span><span class="p">)</span>
+    <span class="n">GridObj</span><span class="o">.</span><span class="n">set_pg</span><span class="p">(</span><span class="n">PgObj</span><span class="p">)</span>
+    <span class="n">GridObj</span><span class="o">.</span><span class="n">set_info</span><span class="p">(</span><span class="n">griddef</span><span class="o">.</span><span class="n">xsiz</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">ysiz</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">xmn</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">ymn</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39; Grid File created&#39;</span><span class="p">)</span>
+
+<span class="c">#read ply </span>
+
+</div>
+<div class="viewcode-block" id="read_ply"><a class="viewcode-back" href="../../index.html#pygeos.io.read_ply">[docs]</a><span class="k">def</span> <span class="nf">read_ply</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read polygon from .ply file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath: filepath for polygon file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (tuple): tuple containing:</span>
+<span class="sd">        </span>
+<span class="sd">        |  ply: pandas DataFrame containing XY coordinates for verticies</span>
+<span class="sd">        |  patch:  matplotlib patch for use in plotting</span>
+<span class="sd">        </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ply</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
+        <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;X&#39;</span><span class="p">,</span><span class="s">&#39;Y&#39;</span><span class="p">],</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ply</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">codes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">closed</span> <span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;black&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">ply</span><span class="p">,</span><span class="n">patch</span><span class="p">)</span>
+
+
+<span class="c">#import LAS files - returns tops dictionary and pandas dataframe</span>
+
+</div>
+<div class="viewcode-block" id="read_LAS"><a class="viewcode-back" href="../../index.html#pygeos.io.read_LAS">[docs]</a><span class="k">def</span> <span class="nf">read_LAS</span><span class="p">(</span><span class="n">FilePath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read LAS files to pandas Dataframe and dictionary of tops </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    </span>
+<span class="sd">        Filepath: location of LAS file</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        (tuple): tuple containing:</span>
+
+<span class="sd">        |  TopsDict: dictionary containing tops </span>
+<span class="sd">        |  WellData: Pandas DataFrame with log data </span>
+<span class="sd">        |  </span>
+
+<span class="sd">        NOTE: Not all LAS files are the same, this function was designed using Petra exported files.</span>
+<span class="sd">        LAS files from other software may yield and error.            </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">topsdict</span><span class="o">=</span><span class="p">{}</span> <span class="c">#dictionary for storing tops</span>
+    <span class="n">Data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FilePath</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c">#get tops</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;#TOP NAME&#39;</span><span class="p">):</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">break</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;~A&#39;</span><span class="p">):</span>
+                <span class="n">colnames</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">break</span>
+            <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">topsdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">val</span>
+        <span class="c">#read columns to pandas dataframe</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">Data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">WellData</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span>
+        <span class="n">WellData</span> <span class="o">=</span> <span class="n">WellData</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">WellData</span><span class="o">.</span><span class="n">columns</span><span class="o">=</span><span class="n">colnames</span>
+        <span class="k">return</span> <span class="n">TopsDict</span><span class="p">,</span> <span class="n">WellData</span>
+
+<span class="c">#import pangeos g2d file, returns pygslib GridDef</span></div>
+<div class="viewcode-block" id="read_g2d"><a class="viewcode-back" href="../../index.html#pygeos.io.read_g2d">[docs]</a><span class="k">def</span> <span class="nf">read_g2d</span> <span class="p">(</span><span class="n">FilePath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read Pangeos g2d file to PyGSLIB GridDef object </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    </span>
+<span class="sd">        Filepath: location of .g2d file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (gs.GridDef): PyGSLIB griddef object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FilePath</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">xmn</span><span class="p">,</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">xsiz</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+        <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">ymn</span><span class="p">,</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">ysiz</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+        <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">nz</span><span class="p">,</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">zmn</span><span class="p">,</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">zsiz</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;XY&#39;</span><span class="p">:</span>
+            <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">nz</span><span class="p">,</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">zmn</span><span class="p">,</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span><span class="o">.</span><span class="n">zsiz</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">gs</span><span class="o">.</span><span class="n">GridDef</span>
+
+<span class="c">#import ASCII tabular from Petra</span>
+
+<span class="c">#import gxdatabase</span>
+<span class="c">#export gxdatabase</span>
+
+<span class="c">#vtk import/export</span>
+<span class="c">#gslib import/export</span>
+
+<span class="c">#read in GSLIB files with griddef in 2nd line</span></div>
+<div class="viewcode-block" id="read_GSLIB"><a class="viewcode-back" href="../../index.html#pygeos.io.read_GSLIB">[docs]</a><span class="k">def</span> <span class="nf">read_GSLIB</span><span class="p">(</span><span class="n">FilePath</span><span class="p">,</span> <span class="n">griddef</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read GSLIB gridded file with grid definition in header.</span>
+
+<span class="sd">        Args:</span>
+
+<span class="sd">            FilePath: Location of .dat GSLIB file </span>
+<span class="sd">            </span>
+<span class="sd">            griddef: pyGSLIB gs.GridDef object </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (tuple): tuple containing:</span>
+
+<span class="sd">            |  griddef: pyGSLIB griddef object with grid definition read from header</span>
+<span class="sd">            |  data: Pandas DataFrame with Grid(s)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FilePath</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">line2</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> 
+        <span class="n">ncols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">line2</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">line2</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+        <span class="n">griddef</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">nz</span> <span class="o">=</span> <span class="n">line2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">griddef</span><span class="o">.</span><span class="n">xmn</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">ymn</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">zmn</span> <span class="o">=</span> <span class="n">line2</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line2</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line2</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+        <span class="n">griddef</span><span class="o">.</span><span class="n">xsiz</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">ysiz</span><span class="p">,</span> <span class="n">griddef</span><span class="o">.</span><span class="n">zsiz</span> <span class="o">=</span> <span class="n">line2</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line2</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line2</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ncols</span><span class="p">):</span>
+            <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">FilePath</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">ncols</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="c">#data.columns = columns</span>
+        <span class="k">return</span> <span class="n">griddef</span><span class="p">,</span> <span class="n">data</span></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Eric Daniels.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

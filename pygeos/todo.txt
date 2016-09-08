@@ -1,0 +1,17 @@
+io formats - listed in io.py
+
+well log plotting - talk to maggie
+
+STOOIP/GIIP calculator
+
+web based paraview? launch from python?
+
+Clustering using Scikit-learn - GMM
+
+close/remove tempfiles when reading/writing GXgrids
+
+pixelplots
+
+GridDef - parse from string or import g2d file
+
+Polygons - read ply file, simple way to add to plots
