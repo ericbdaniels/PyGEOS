@@ -10,4 +10,4 @@ Dependencies:
 	To avoid issue be sure to install Pandas, NumPy, PyGSLIB,  and Matplotlib
 
 
-PyGEOS Documentation is available in ./docs/build in both html and pdf formate
+PyGEOS Documentation is available in ./docs/build in both html and pdf format
