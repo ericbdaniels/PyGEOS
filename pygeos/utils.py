@@ -6,7 +6,7 @@ __author__ = "Eric Daniels"
 # @Author: edaniels
 # @Date:   2015-10-09 08:11:39
 # @Last Modified by:   edaniels
-# @Last Modified time: 2016-07-08 14:05:18
+# @Last Modified time: 2016-09-28 21:57:08
 
 
 """
@@ -130,3 +130,19 @@ def gap(data, refs=None, nrefs=20, ks=range(1,11)):
         refs[i] = refdisps
         disps[i] = disp
     return refs, disps, gaps
+
+
+
+
+def reorder(A, column, values):
+    """Re-order data frame based on a column (given in the parameter
+       column, which must have unique values) NOTE: will drop rows not contained in values"""
+    #if set(A[column]) != set(values):
+    #    raise Exception("ERROR missing values for re-ordering")
+    at_position = {}
+    index = 0;
+    for v in A[column]:
+        at_position[v] = index
+        index += 1
+    re_position = [ at_position[v] for v in values ]
+    return A.iloc[ re_position ]
