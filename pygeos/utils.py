@@ -6,7 +6,7 @@ __author__ = "Eric Daniels"
 # @Author: edaniels
 # @Date:   2015-10-09 08:11:39
 # @Last Modified by:   edaniels
-# @Last Modified time: 2016-09-28 21:57:08
+# @Last Modified time: 2016-10-21 10:06:08
 
 
 """
@@ -146,3 +146,35 @@ def reorder(A, column, values):
         index += 1
     re_position = [ at_position[v] for v in values ]
     return A.iloc[ re_position ]
+
+
+
+    def rotate_xy(x,y):
+            """
+    Counter clockwise coordinate rotation around an origin pt
+
+    Args: 
+
+        x,y: List of of coordinates to be rotated
+
+        angle: Angle of rotation (Degrees)
+
+        origin_x, origin_y: point to be rotated around
+
+
+    Returns:
+        rot_x, rot_y: lists of rotated points
+    """
+    rotx=[]
+    roty=[]
+    for i, j in zip(x,y,angle, origin_x=0, origin_y=0):
+        rads = np.radians(angle)
+
+        x_tmp = i-origin_x
+        y_tmp = j-origin_y
+        
+        rot_i= origin_x +x_tmp*np.cos(rads)-y_tmp*np.sin(rads)
+        rot_j = origin_y + y_tmp*np.cos(rads)+x_tmp*np.sin(rads)
+        rotx.append(rot_i)
+        roty.append(rot_j)
+    return rotx,roty
